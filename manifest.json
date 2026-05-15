@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "WATI Sticky Notes",
+  "version": "1.0.0",
+  "description": "为 WATI 对话添加私人便签备注",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://live.wati.io/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

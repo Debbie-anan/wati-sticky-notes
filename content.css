@@ -1,0 +1,142 @@
+#wati-sticky-note {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 200px;
+  height: 160px;
+  min-width: 140px;
+  min-height: 100px;
+  background: #fff9c4;
+  border: 1px solid #f0e68c;
+  border-radius: 4px;
+  box-shadow: 2px 3px 12px rgba(0,0,0,0.15);
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s;
+  resize: both;
+  overflow: hidden;
+}
+
+#wati-sticky-note:hover {
+  box-shadow: 2px 4px 16px rgba(0,0,0,0.22);
+}
+
+#wati-sticky-note.minimized {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#wati-sticky-note.minimized #wati-sticky-header,
+#wati-sticky-note.minimized #wati-sticky-body {
+  display: none;
+}
+
+#wati-sticky-note.minimized #wati-sticky-mini-icon {
+  display: flex;
+}
+
+#wati-sticky-mini-icon {
+  display: none;
+  font-size: 20px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+#wati-sticky-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #ffe082;
+  border-radius: 4px 4px 0 0;
+  cursor: move;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+#wati-sticky-header .title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5d4037;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+#wati-sticky-copy {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 4px;
+  color: #795548;
+  flex-shrink: 0;
+}
+
+#wati-sticky-copy:hover {
+  color: #3e2723;
+}
+
+#wati-sticky-header .actions {
+  display: flex;
+  gap: 6px;
+}
+
+#wati-sticky-header .actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #795548;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+#wati-sticky-header .actions button:hover {
+  color: #3e2723;
+}
+
+#wati-sticky-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  overflow: hidden;
+}
+
+#wati-sticky-textarea {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: transparent;
+  resize: none;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #4e342e;
+  outline: none;
+  font-family: inherit;
+}
+
+#wati-sticky-textarea::placeholder {
+  color: #a1887f;
+}
+
+#wati-sticky-status {
+  font-size: 10px;
+  color: #a1887f;
+  text-align: right;
+  padding-top: 4px;
+  flex-shrink: 0;
+}
