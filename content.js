@@ -120,58 +120,42 @@
   }
 
   function getCustomerDisplayName() {
-    // 从 CONTACT ATTRIBUTES 区域读取 name 字段
-    const allEls = document.querySelectorAll('span, div, h3, h4, p, td');
-    let attrSection = null;
-    for (const el of allEls) {
-      if (el.children.length <= 2 && el.textContent.trim() === 'CONTACT ATTRIBUTES') {
-        attrSection = el.closest('div[class]') || el.parentElement;
-        break;
-      }
-    }
+    // 直接查找页面中文本为 "name" 的叶子元素，读取同行的值
+    const candidates = document.querySelectorAll('span, div, td, label, p');
+    for (const el of candidates) {
+      if (el.children.length > 0) continue;
+      const text = el.textContent.trim();
+      if (text !== 'name') continue;
 
-    if (attrSection) {
-      const labels = attrSection.querySelectorAll('span, div, td, label, p');
-      for (const label of labels) {
-        if (label.children.length > 1) continue;
-        const t = label.textContent.trim();
-        if (t === 'name' || t === 'Name') {
-          const row = label.closest('tr') || label.closest('div[class]') || label.parentElement;
-          if (row) {
-            const cells = row.querySelectorAll('span, div, td, p, a');
-            for (const cell of cells) {
-              if (cell.contains(label) && cell === label) continue;
-              const val = cell.textContent.trim();
-              if (val && val !== 'name' && val !== 'Name' && val.length >= 2 && val.length <= 60) {
-                return val;
-              }
-            }
-          }
-          const next = label.nextElementSibling;
-          if (next) {
-            const val = next.textContent.trim();
-            if (val && val.length >= 2 && val.length <= 60) return val;
-          }
+      // 找到 "name" 标签，从父级容器中获取对应值
+      const parent = el.parentElement;
+      if (!parent) continue;
+
+      const siblings = parent.querySelectorAll('span, div, td, p, a');
+      for (const sib of siblings) {
+        if (sib === el || sib.contains(el) || el.contains(sib)) continue;
+        const val = sib.textContent.trim();
+        if (val && val !== 'name' && val.length >= 2 && val.length <= 60
+            && !/^\+?\(?\d[\d\s()+-]+\d$/.test(val)) {
+          return val;
         }
       }
-    }
 
-    // 后备：从右侧面板顶部读取客户名（CONTACT INFO 上方的大标题）
-    const headers = document.querySelectorAll('span, div, h1, h2, h3, h4');
-    for (const el of headers) {
-      if (el.children.length <= 1 && el.textContent.trim() === 'CONTACT INFO') {
-        let container = el.closest('div[class]') || el.parentElement;
-        if (container) container = container.parentElement;
-        if (container) {
-          const first = container.querySelector('span, div, h1, h2, h3, h4');
-          if (first) {
-            const val = first.textContent.trim();
-            if (val && val !== 'CONTACT INFO' && val.length >= 2 && val.length <= 60 && !/^\+?\(?\d[\d\s()+-]+\d$/.test(val) && !/^(CONTACT|Phone|User|CX)/i.test(val)) {
-              return val;
-            }
-          }
+      // 尝试下一个兄弟元素
+      const next = el.nextElementSibling;
+      if (next) {
+        const val = next.textContent.trim();
+        if (val && val !== 'name' && val.length >= 2 && val.length <= 60) return val;
+      }
+
+      // 尝试父级的下一个兄弟
+      const parentNext = parent.nextElementSibling;
+      if (parentNext) {
+        const val = parentNext.textContent.trim();
+        if (val && val.length >= 2 && val.length <= 60
+            && !/^\+?\(?\d[\d\s()+-]+\d$/.test(val)) {
+          return val;
         }
-        break;
       }
     }
 
