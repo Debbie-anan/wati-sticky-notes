@@ -3,7 +3,7 @@
   let saveTimeout = null;
 
   function getCustomerIdFromUrl() {
-    const match = window.location.pathname.match(/\/teamInbox\/(\d+)/);
+    const match = window.location.pathname.match(/\/teamInbox\/([a-zA-Z0-9]+)/);
     return match ? match[1] : null;
   }
 
