@@ -120,37 +120,58 @@
   }
 
   function getCustomerDisplayName() {
-    // 1. 精确选择器：WATI 右侧面板的客户名
-    const selectors = [
-      '[data-testid="teamInbox-rightSide-conversationList-profileName"]',
-      '[class*="sidebar"] [class*="user-info"] div',
-      '[class*="sidebar_user-info"] div',
-      '[class*="user-info-wrap"] div',
-      '[class*="profileName"]',
-    ];
-    for (const sel of selectors) {
-      const el = document.querySelector(sel);
-      if (el) {
-        const text = el.textContent.trim();
-        if (text && text.length >= 2 && text.length <= 60 && !/^\+?\(?\d[\d\s()+-]+\d$/.test(text) && !/^(CONTACT|Phone|User|CX)/i.test(text)) {
-          return text;
+    // 从 CONTACT ATTRIBUTES 区域读取 name 字段
+    const allEls = document.querySelectorAll('span, div, h3, h4, p, td');
+    let attrSection = null;
+    for (const el of allEls) {
+      if (el.children.length <= 2 && el.textContent.trim() === 'CONTACT ATTRIBUTES') {
+        attrSection = el.closest('div[class]') || el.parentElement;
+        break;
+      }
+    }
+
+    if (attrSection) {
+      const labels = attrSection.querySelectorAll('span, div, td, label, p');
+      for (const label of labels) {
+        if (label.children.length > 1) continue;
+        const t = label.textContent.trim();
+        if (t === 'name' || t === 'Name') {
+          const row = label.closest('tr') || label.closest('div[class]') || label.parentElement;
+          if (row) {
+            const cells = row.querySelectorAll('span, div, td, p, a');
+            for (const cell of cells) {
+              if (cell.contains(label) && cell === label) continue;
+              const val = cell.textContent.trim();
+              if (val && val !== 'name' && val !== 'Name' && val.length >= 2 && val.length <= 60) {
+                return val;
+              }
+            }
+          }
+          const next = label.nextElementSibling;
+          if (next) {
+            const val = next.textContent.trim();
+            if (val && val.length >= 2 && val.length <= 60) return val;
+          }
         }
       }
     }
 
-    // 2. 后备：获取电话号码
-    const labels = document.querySelectorAll('span, div, td, label');
-    for (const el of labels) {
-      if (el.children.length > 2) continue;
-      if (el.textContent.trim() === 'Phone Number') {
-        const parent = el.parentElement;
-        if (parent) {
-          const texts = parent.querySelectorAll('span, a, div');
-          for (const t of texts) {
-            const val = t.textContent.trim();
-            if (val && val !== 'Phone Number' && /\+?\(?\d/.test(val)) return val;
+    // 后备：从右侧面板顶部读取客户名（CONTACT INFO 上方的大标题）
+    const headers = document.querySelectorAll('span, div, h1, h2, h3, h4');
+    for (const el of headers) {
+      if (el.children.length <= 1 && el.textContent.trim() === 'CONTACT INFO') {
+        let container = el.closest('div[class]') || el.parentElement;
+        if (container) container = container.parentElement;
+        if (container) {
+          const first = container.querySelector('span, div, h1, h2, h3, h4');
+          if (first) {
+            const val = first.textContent.trim();
+            if (val && val !== 'CONTACT INFO' && val.length >= 2 && val.length <= 60 && !/^\+?\(?\d[\d\s()+-]+\d$/.test(val) && !/^(CONTACT|Phone|User|CX)/i.test(val)) {
+              return val;
+            }
           }
         }
+        break;
       }
     }
 
